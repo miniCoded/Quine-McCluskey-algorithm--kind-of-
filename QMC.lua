@@ -371,7 +371,13 @@ function QMCGenSolution(e_miniterms, bit, vars)
 					solution = solution .. vars[i].symbol
 				end
 			elseif char == "0" then 
-				solution = solution .. vars[i].symbol .. "'"
+				if not vars then
+					solution = solution .. string.char(bits + i - 1) .. "'"
+					
+				else
+
+					solution = solution .. vars[i].symbol .. "'"
+				end
 			else
 				dont_care = dont_care + 1
 			end

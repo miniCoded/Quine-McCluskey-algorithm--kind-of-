@@ -21,11 +21,12 @@ end
 -- truth = {"1", "0", "1", "0", "1", "1", "1", "0"}
 -- truth = {"0", "0", "0", "0", "1", "1", "1", "0"}
 -- truth = {"1", "1", "0", "1", "1", "0", "1", "0"}
+truth = {'1', '0', '1', '1', '0', '1', '0', '0'}
 
-local m, bits, exp, tok = QMCSelectMiniterm()
+local m, bits, exp, tok = QMCSelectMiniterm(bits, truth)
 local raw_e_miniterms = QMCMixMiniterms(m, bits)
 local e_miniterms = QMCFilterEMiniterms(raw_e_miniterms)
-local solution = QMCGenSolution(e_miniterms, bits, GetVars(exp, tok))
+local solution = QMCGenSolution(e_miniterms, bits)--[[, GetVars(exp, tok))]]
 
 print("Essential miniterms: ")
 for i = 1, #e_miniterms, 1 do
