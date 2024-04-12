@@ -322,32 +322,7 @@ function QMCFilterEMiniterms(raw_e_miniterms)
 			end
 		end
 	end
-
-	-- Ignore the next piece of code. The previous filtering stage is just-enough as the next one does nothing
-	do
-		local nums = {}
-		for _, min in pairs(raw_e_miniterms) do
-			for _, n in pairs(min.nums) do
-				table.insert(nums, n)
-			end
-		end
-		do
-			local i = 1
-			local count = 1
-			table.sort(nums)
-			while i <= #nums do
-				local n = nums[i]
-				if nums[i] == nums[i+1] then
-					table.remove(nums, i)
-					count = count + 1
-				else
-					nums[i] = miniterm:new("placeholder", {n, count})
-					count = 1
-					i = i + 1
-				end
-			end
-		end
-	end
+	
 	return raw_e_miniterms, e_miniterms
 end
 
