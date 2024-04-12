@@ -16,10 +16,14 @@ local BooleanExp = require("Boolean_exp.BoolExp")
 -- Miniterms are selected if the bit in the truth table is 1
 -- n is the number of terms
 -- bits is the length of the numbers in binary
+-- If n is not defined but bits is, then the program will take a truth table as bits
+-- If bits is not defined but n is, then the function will ask you to introduce a truth table manually
+-- If neither is defined, then the program will take a boolean expression
 function QMCSelectMiniterm(n, bits)
 	-- Selected miniterms
 	local m = {}
 
+	-- Ask for 2^n-1 terms
 	if not bits and n then
 		print("Insert 0 or 1 depending on the output of the truth table")
 		io.write('\n')
@@ -47,7 +51,8 @@ function QMCSelectMiniterm(n, bits)
 		end
 		
 		io.write('\n')
-		
+	
+	-- Take bits as a truth table
 	elseif bits then
 		for i = 1, #bits, 1 do
 			if bits[i] == "1" then
@@ -55,6 +60,8 @@ function QMCSelectMiniterm(n, bits)
 				table.insert(m, miniterm:new(repr, {i-1}))
 			end
 		end
+	
+	-- Take a boolean expression
 	elseif not n then
 		io.write("Insert the expression: ")
 		local exp = io.read()
@@ -64,13 +71,18 @@ function QMCSelectMiniterm(n, bits)
 		end
 		local tokens = Tokenize(exp)
 		io.write(" RES\n")
+		-- Iterate for 2^#vars
 		for i = 0, 2^#vars-1, 1 do
+			-- Get the binary representation of i
 			local bin = toBinary(i, #vars)
+			-- The input for every variable
 			local truth = {}
 			local res = '0'
 			for j = 1, #bin, 1 do
 				table.insert(truth, string.sub(bin, j, j))
 			end
+
+			-- Input vars, the generated tokens and the bits
 			res = Parse(vars, Gen_AST(tokens), truth)
 			for _, b in pairs(truth) do
 				io.write(b, " ")
@@ -326,14 +338,18 @@ function QMCFilterEMiniterms(raw_e_miniterms)
 	return raw_e_miniterms, e_miniterms
 end
 
+-- Vars is in case the boolean expression way was choosen
 function QMCGenSolution(e_miniterms, bit, vars)
 	local solution  = ""
+
+	-- If no miniterms were generated, it means there's no solution
 	if #e_miniterms == 0 then
 		solution = "0"
 		return solution
 	end
 	local dont_care = 0
 	for m = 1, #e_miniterms, 1 do
+		-- From A to Z
 		local bits = 65
 		local v = e_miniterms[m]
 
@@ -348,9 +364,7 @@ function QMCGenSolution(e_miniterms, bit, vars)
 			elseif char == "0" then 
 				if not vars then
 					solution = solution .. string.char(bits + i - 1) .. "'"
-					
 				else
-
 					solution = solution .. vars[i].symbol .. "'"
 				end
 			else
@@ -362,6 +376,7 @@ function QMCGenSolution(e_miniterms, bit, vars)
 		end
 	end
 
+	-- If the miniterm only contains dont-care terms, it means that the solution is just 1
 	if dont_care == bit and #e_miniterms == 1 then
 		solution = "1"
 	end
